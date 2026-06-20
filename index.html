@@ -899,9 +899,6 @@ async function onDriveTokenReceived(resp) {
     statusEl.textContent = '✓ Drive 저장 완료';
     statusEl.className = 'upload-status success';
 
-    downloadBlob(pdfBlob, baseName + '-이명설문.pdf');
-    downloadBlob(txtBlob, baseName + '-이명.txt');
-
   } catch (err) {
     statusEl.textContent = '오류: ' + err.message;
     statusEl.className = 'upload-status error';
