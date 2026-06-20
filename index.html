@@ -560,6 +560,24 @@
   .upload-status.uploading { background: #eef3f7; color: #2c5f7c; }
   .upload-status.success   { background: #e6f4ea; color: #1a7330; }
   .upload-status.error     { background: #fce8e6; color: #c5221f; }
+
+  /* 병원 브랜드 */
+  .hospital-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0 8px;
+  }
+  .hospital-logo {
+    height: 32px;
+    width: auto;
+  }
+  .hospital-name {
+    font-size: 15px;
+    font-weight: bold;
+    color: #2c5f7c;
+  }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
@@ -599,6 +617,10 @@
     </div>
 
     <div class="page-error" id="page1Error"></div>
+    <div class="hospital-brand">
+      <img src="logo.png" alt="" class="hospital-logo">
+      <span class="hospital-name">분당하나이비인후과의원</span>
+    </div>
     <div class="nav-buttons">
       <button class="btn-primary" id="page1Next" type="button">다음</button>
     </div>
@@ -684,6 +706,10 @@
     <div id="vasBlocks"></div>
 
     <div class="page-error" id="page2Error"></div>
+    <div class="hospital-brand">
+      <img src="logo.png" alt="" class="hospital-logo">
+      <span class="hospital-name">분당하나이비인후과의원</span>
+    </div>
     <div class="nav-buttons">
       <button class="btn-primary" id="page2Next" type="button">다음</button>
     </div>
@@ -709,6 +735,10 @@
     </table>
 
     <div class="page-error" id="page3Error"></div>
+    <div class="hospital-brand">
+      <img src="logo.png" alt="" class="hospital-logo">
+      <span class="hospital-name">분당하나이비인후과의원</span>
+    </div>
     <div class="nav-buttons">
       <button class="btn-secondary" id="page3Prev" type="button">이전</button>
       <button class="btn-primary" id="page3Next" type="button">다음</button>
@@ -769,6 +799,10 @@
     </div>
 
     <div class="page-error" id="page4Error"></div>
+    <div class="hospital-brand">
+      <img src="logo.png" alt="" class="hospital-logo">
+      <span class="hospital-name">분당하나이비인후과의원</span>
+    </div>
     <div class="nav-buttons">
       <button class="btn-secondary" id="page4Prev" type="button">이전</button>
       <button class="btn-primary" id="page4Finish" type="button">완료</button>
@@ -781,6 +815,10 @@
       <p>설문에 참여해주셔서 감사합니다.</p>
       <p>설문 내용은 진료에 참고하겠습니다.</p>
       <p id="insuranceNote" style="display:none;">실비보험 서류를 준비해드리겠습니다.</p>
+    </div>
+    <div class="hospital-brand">
+      <img src="logo.png" alt="" class="hospital-logo">
+      <span class="hospital-name">분당하나이비인후과의원</span>
     </div>
     <p id="uploadStatus" class="upload-status"></p>
   </section>
@@ -890,6 +928,22 @@ async function driveUpload(blob, name, mime, folderId, token) {
 /* ============ 한글 폰트 로딩 (페이지 시작 시 백그라운드) ============ */
 let koreanFontB64 = null;
 let koreanFontBoldB64 = null;
+let logoB64 = null;
+(async function loadLogo() {
+  try {
+    const res = await fetch('./logo.png');
+    if (!res.ok) return;
+    const buf = await res.arrayBuffer();
+    const bytes = new Uint8Array(buf);
+    let binary = '';
+    for (let i = 0; i < bytes.length; i += 8192) {
+      binary += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + 8192, bytes.length)));
+    }
+    logoB64 = btoa(binary);
+  } catch(e) {
+    console.warn('로고 로딩 실패:', e);
+  }
+})();
 (async function loadKoreanFonts() {
   async function ttfToB64(url) {
     const res = await fetch(url);
@@ -1207,6 +1261,34 @@ async function generatePdfBlob(r) {
     doc.setFont(F, "normal");
   }
 
+  /* PDF 각 페이지 하단 병원 브랜드 삽입 */
+  function addPageFooter() {
+    var PW = 210;
+    var footerY = 289;
+    var label = '분당하나이비인후과의원';
+    doc.setFont(F, 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(80, 80, 80);
+    if (logoB64) {
+      try {
+        var props = doc.getImageProperties(logoB64);
+        var logoH = 7;
+        var logoW = logoH * (props.width / props.height);
+        var gap = 2;
+        var textW = doc.getTextWidth(label);
+        var startX = (PW - (logoW + gap + textW)) / 2;
+        doc.addImage(logoB64, 'PNG', startX, footerY - logoH + 1, logoW, logoH, '', 'FAST');
+        doc.text(label, startX + logoW + gap, footerY);
+      } catch(e) {
+        doc.text(label, PW / 2, footerY, { align: 'center' });
+      }
+    } else {
+      doc.text(label, PW / 2, footerY, { align: 'center' });
+    }
+    doc.setTextColor(0, 0, 0);
+    doc.setFont(F, 'normal');
+  }
+
   /* 이미지 원본 비율 유지 삽입 */
   function addImgRatio(dataUrl, ix, iy, maxW, maxH) {
     if (!dataUrl) return 0;
@@ -1306,6 +1388,8 @@ async function generatePdfBlob(r) {
   doc.setFont(F, "bold"); doc.text("서명", sigX, y + 8); doc.setFont(F, "normal");
   var sigH2 = addImgRatio(r.consent.signature, sigImgX, y, sigImgMaxW, sigImgMaxH);
   y += Math.max(sigH2 > 0 ? sigH2 : 12, 12);
+
+  addPageFooter();
 
   /* ===== PAGE 2 : 설문 결과 ===== */
   doc.addPage(); y = 18;
@@ -1457,6 +1541,7 @@ async function generatePdfBlob(r) {
       4: { cellWidth: 16, halign: "center" },
     },
   }));
+  addPageFooter();
 
   return doc.output("blob");
 }
