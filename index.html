@@ -1,0 +1,1835 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이명 초진 설문지</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2c5f7c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    overflow-x: hidden;
+  }
+  body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    background: #f4f6f8;
+    margin: 0;
+    padding: 0 0 60px 0;
+    color: #222;
+  }
+  .container {
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 24px 20px;
+    overflow-x: hidden;
+  }
+  h1 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 0;
+  }
+  .title-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+  .font-size-controls {
+    display: none;
+    gap: 6px;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .font-size-controls.visible { display: flex; }
+  .font-size-controls button {
+    border: 1px solid #ccc;
+    background: #f7f7f7;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #444;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .font-size-controls button:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+  .patient-info-bar {
+    display: none;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    background: #eef3f7;
+    border: 1px solid #d6e3ec;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #444;
+    margin-bottom: 20px;
+  }
+  .patient-info-bar b { color: #1f4659; }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .info-section {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+    padding: 16px;
+    background: #f0f4f8;
+    border-radius: 8px;
+  }
+  .info-section label {
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+    color: #444;
+    gap: 4px;
+  }
+  .info-section input {
+    width: 100%;
+    min-width: 0;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  @media (max-width: 480px) {
+    .info-section {
+      grid-template-columns: 1fr;
+    }
+  }
+  .consent-section {
+    border: 1px solid #d9c8a0;
+    background: #fffbf0;
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-bottom: 24px;
+    font-size: 13.5px;
+    line-height: 1.7;
+  }
+  .consent-doc-title {
+    font-size: 13px;
+    font-weight: bold;
+    color: #6b6b6b;
+    text-align: left;
+    margin: 0 0 6px 0;
+  }
+  .consent-section h2 {
+    font-size: 20px;
+    text-align: center;
+    margin: 0 0 4px 0;
+    color: #5c4a1e;
+  }
+  .consent-section .consent-subtitle {
+    font-size: 12px;
+    text-align: center;
+    color: #888;
+    margin: 0 0 12px 0;
+  }
+  .consent-section ul {
+    margin: 6px 0 12px 0;
+    padding-left: 20px;
+  }
+  .consent-section .fee-box {
+    background: #f5ecd9;
+    border: 1px solid #e0cfa0;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 12px 0;
+  }
+  .consent-section .fee-box p {
+    margin: 4px 0;
+  }
+  .consent-section .agree-row {
+    margin: 16px 0 10px 0;
+    font-weight: bold;
+  }
+  .consent-section .agree-row input {
+    transform: scale(1.2);
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .consent-section .signature-row {
+    display: flex;
+    gap: 14px;
+    margin: 14px 0;
+    align-items: flex-start;
+  }
+  .consent-section .sign-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .consent-section .sign-col .label {
+    text-align: center;
+    margin-bottom: 6px;
+    font-weight: bold;
+    font-size: 13px;
+  }
+  .name-write-box {
+    border: 2px dashed #c2b489;
+    border-radius: 8px;
+    height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: #fff;
+    color: #999;
+    font-size: 14px;
+    overflow: hidden;
+  }
+  .name-write-box img {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+  }
+  .signature-box {
+    border: 2px dashed #c2b489;
+    border-radius: 8px;
+    height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: #fff;
+    color: #999;
+    font-size: 14px;
+    overflow: hidden;
+  }
+  .signature-box img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+  .consent-section .insurance-row {
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px dashed #d9c8a0;
+  }
+  .consent-section .insurance-note {
+    color: #888;
+    font-size: 12px;
+    margin-top: 4px;
+    margin-left: 24px;
+  }
+
+  .referral-section { margin-bottom: 24px; }
+  .referral-title {
+    font-weight: bold;
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+  .referral-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .referral-item {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 13.5px;
+  }
+  .referral-item label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+  .referral-item input[type="checkbox"] {
+    transform: scale(1.2);
+  }
+  .referral-item .sub {
+    color: #999;
+    font-size: 11.5px;
+    margin-left: 24px;
+    margin-top: 2px;
+  }
+  .referral-item input[type="text"] {
+    margin-top: 6px;
+    margin-left: 24px;
+    width: calc(100% - 24px);
+    padding: 5px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 12.5px;
+    font-family: inherit;
+  }
+
+  .instruction {
+    background: #fff8e1;
+    border: 1px solid #ffe082;
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+  thead th {
+    background: #2c5f7c;
+    color: #fff;
+    padding: 10px 6px;
+    font-size: 13px;
+  }
+  tbody tr:nth-child(even) {
+    background: #f7f9fb;
+  }
+  tbody td {
+    padding: 10px 6px;
+    border-bottom: 1px solid #e0e0e0;
+    vertical-align: middle;
+  }
+  td.qnum {
+    width: 32px;
+    text-align: center;
+    color: #888;
+    font-size: 12px;
+  }
+  td.qtext {
+    line-height: 1.5;
+  }
+  td.choice {
+    text-align: center;
+    width: 70px;
+    white-space: nowrap;
+  }
+  td.choice input {
+    transform: scale(1.3);
+    cursor: pointer;
+  }
+  .choice-header {
+    text-align: center;
+    width: 70px;
+  }
+
+  /* 일반 설문 (페이지 2) */
+  .q-block {
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #eee;
+  }
+  .q-block:last-of-type { border-bottom: none; }
+  .q-title {
+    font-weight: bold;
+    font-size: 14.5px;
+    margin-bottom: 10px;
+  }
+  .radio-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 14px;
+  }
+  .radio-row label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+  }
+  .radio-row input { transform: scale(1.2); }
+
+  .duration-inputs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    flex-wrap: wrap;
+  }
+  .duration-inputs input {
+    width: 64px;
+    padding: 7px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 14px;
+    font-family: inherit;
+  }
+
+  .symptom-group {
+    border: 1px solid #e6e6e6;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    background: #fafafa;
+  }
+  .symptom-group-title {
+    font-weight: bold;
+    font-size: 13.5px;
+    margin-bottom: 8px;
+    color: #2c5f7c;
+  }
+  .symptom-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    font-size: 13.5px;
+  }
+  .symptom-options label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+  }
+  .symptom-options input { transform: scale(1.15); }
+  .symptom-other-input {
+    margin-left: 4px;
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 12.5px;
+    width: 140px;
+    font-family: inherit;
+  }
+  .symptom-other-row {
+    flex-basis: 100%;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .symptom-other-row .symptom-other-input {
+    margin-left: 0;
+  }
+
+  .text-input-full {
+    width: 100%;
+    padding: 9px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+  }
+
+  .vas-options {
+    display: flex;
+    justify-content: space-between;
+    gap: 2px;
+    margin-top: 10px;
+  }
+  .vas-options label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 12px;
+    gap: 4px;
+    flex: 1;
+    cursor: pointer;
+  }
+  .vas-options input { transform: scale(1.2); }
+  .vas-anchors {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11.5px;
+    color: #777;
+    margin-top: 6px;
+    gap: 10px;
+  }
+  .vas-anchors span:last-child { text-align: right; }
+
+  /* 네비게이션 & 오류 */
+  .nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 24px;
+  }
+  .nav-buttons button {
+    flex: 1;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-primary { background: #2c5f7c; color: #fff; }
+  .btn-primary:hover { background: #1f4659; }
+  .btn-secondary { background: #e0e6ea; color: #444; }
+  .btn-secondary:hover { background: #cfd8dd; }
+
+  .page-error {
+    color: #c0392b;
+    font-size: 13px;
+    margin-top: 14px;
+    line-height: 1.7;
+    display: none;
+  }
+
+  /* 완료 페이지 */
+  #page5.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+  }
+  .thank-you {
+    text-align: center;
+  }
+  .thank-you p {
+    font-size: 22px;
+    font-weight: bold;
+    line-height: 1.8;
+    margin: 10px 0;
+    color: #1f4659;
+  }
+
+  /* 서명 모달 */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-content {
+    background: #fff;
+    border-radius: 10px;
+    padding: 16px;
+    width: 100%;
+    max-width: 640px;
+  }
+  .modal-content h3 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    text-align: center;
+  }
+  #signatureCanvas, #nameCanvas {
+    width: 100%;
+    height: 240px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    touch-action: none;
+    background: #fff;
+    display: block;
+  }
+  .modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .modal-buttons button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  /* Drive 업로드 상태 표시 */
+  .upload-status {
+    margin-top: 16px;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    min-height: 1.5em;
+  }
+  .upload-status.uploading { background: #eef3f7; color: #2c5f7c; }
+  .upload-status.success   { background: #e6f4ea; color: #1a7330; }
+  .upload-status.error     { background: #fce8e6; color: #c5221f; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+<div class="container">
+  <div class="patient-info-bar" id="patientInfoBar">
+    <span>환자번호: <b id="infoChartNo">-</b></span>
+    <span>환자이름: <b id="infoName">-</b> (<span id="infoBirth">-</span>)</span>
+    <span>작성일자: <b id="infoDateTime">-</b></span>
+  </div>
+
+  <div class="title-row">
+    <h1>이명 초진 설문지</h1>
+    <div class="font-size-controls" id="fontSizeControls">
+      <button type="button" id="fontDecrease" aria-label="글씨 크기 감소">글씨 -</button>
+      <button type="button" id="fontIncrease" aria-label="글씨 크기 증가">글씨 +</button>
+    </div>
+  </div>
+
+  <!-- ============ PAGE 1 : 환자 정보 ============ -->
+  <section class="page active" id="page1">
+    <div class="info-section">
+      <label>이름
+        <input type="text" id="patientName" required>
+      </label>
+      <label>생년월일
+        <input type="text" id="patientBirth" inputmode="numeric" placeholder="YYYY.MM.DD" maxlength="10">
+      </label>
+      <label>환자번호
+        <input type="text" id="chartNo" inputmode="numeric" placeholder="환자번호 입력">
+      </label>
+      <label>검사일
+        <input type="text" id="examDate" inputmode="numeric" placeholder="YYYY.MM.DD" maxlength="10">
+      </label>
+    </div>
+
+    <div class="page-error" id="page1Error"></div>
+    <div class="nav-buttons">
+      <button class="btn-primary" id="page1Next" type="button">다음</button>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 2 : 이명에 대한 일반 설문 ============ -->
+  <section class="page" id="page2">
+    <div class="instruction">
+      현재 경험중인 환자분의 이명 정도와 일상에서의 불편함, 그리고 이명으로 인한 우울 정도 등을 객관적으로 평가하기 위해 설문지를 시행하고 있습니다. 최대한 현재 느끼는 그대로 작성해 주십시오.
+    </div>
+
+    <div class="q-block">
+      <div class="q-title">이명이 어디서 들립니까?</div>
+      <div class="radio-row">
+        <label><input type="radio" name="location" value="right"> 오른쪽 귀</label>
+        <label><input type="radio" name="location" value="left"> 왼쪽 귀</label>
+        <label><input type="radio" name="location" value="both"> 양쪽 귀</label>
+        <label><input type="radio" name="location" value="unknown"> 모르겠다</label>
+      </div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-title">이명이 생긴지 얼마나 되었습니까?</div>
+      <div class="duration-inputs">
+        <input type="number" min="0" id="durYears" placeholder="0"> 년
+        <input type="number" min="0" id="durMonths" placeholder="0"> 개월
+        <input type="number" min="0" id="durDays" placeholder="0"> 일
+      </div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-title">이명이 어떻게 발생했습니까?</div>
+      <div class="radio-row">
+        <label><input type="radio" name="onset" value="gradual"> 서서히 발생</label>
+        <label><input type="radio" name="onset" value="sudden"> 갑자기 발생</label>
+      </div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-title">이명의 양상</div>
+      <div id="symptomGroups"></div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-title">이명 외에 가지고 있는 증상을 열거해 주십시오</div>
+      <div class="symptom-group">
+        <div class="symptom-options">
+          <label><input type="checkbox" name="otherSymptoms" value="난청"> 난청</label>
+          <label><input type="checkbox" name="otherSymptoms" value="어지러움"> 어지러움</label>
+          <label><input type="checkbox" name="otherSymptoms" value="중이염"> 중이염</label>
+          <label><input type="checkbox" name="otherSymptoms" value="기타" id="otherSymptoms_otherCheck"> 기타</label>
+          <input type="text" class="symptom-other-input" id="otherSymptoms_otherText" placeholder="직접 입력">
+        </div>
+      </div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-title">현재 앓고 있는 질환이 있다면 선택해 주십시오</div>
+      <div class="symptom-group">
+        <div class="symptom-options">
+          <label><input type="checkbox" name="underlyingConditions" value="혈압"> 혈압</label>
+          <label><input type="checkbox" name="underlyingConditions" value="당뇨"> 당뇨</label>
+          <label><input type="checkbox" name="underlyingConditions" value="뇌경색"> 뇌경색</label>
+          <label><input type="checkbox" name="underlyingConditions" value="뇌출혈"> 뇌출혈</label>
+          <label><input type="checkbox" name="underlyingConditions" value="턱관절 장애"> 턱관절 장애</label>
+          <label><input type="checkbox" name="underlyingConditions" value="두경부 외상"> 두경부 외상</label>
+          <div class="symptom-other-row">
+            <label><input type="checkbox" name="underlyingConditions" value="기타" id="underlyingConditions_otherCheck"> 기타</label>
+            <input type="text" class="symptom-other-input" id="underlyingConditions_otherText" placeholder="직접 입력">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-title">큰 소리를 들으면 귀의 아픔이나 불편함이 있습니까?</div>
+      <div class="radio-row">
+        <label><input type="radio" name="loudDiscomfort" value="yes"> 있다</label>
+        <label><input type="radio" name="loudDiscomfort" value="no"> 없다</label>
+      </div>
+    </div>
+
+    <div id="vasBlocks"></div>
+
+    <div class="page-error" id="page2Error"></div>
+    <div class="nav-buttons">
+      <button class="btn-primary" id="page2Next" type="button">다음</button>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 3 : THI ============ -->
+  <section class="page" id="page3">
+    <div class="instruction">
+      아래 질문에 대하여 가장 적절한 답변에 체크 표시를 해주세요.
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width:32px;">번호</th>
+          <th>문항</th>
+          <th class="choice-header">그렇다</th>
+          <th class="choice-header">가끔 그렇다</th>
+          <th class="choice-header">아니다</th>
+        </tr>
+      </thead>
+      <tbody id="questionBody"></tbody>
+    </table>
+
+    <div class="page-error" id="page3Error"></div>
+    <div class="nav-buttons">
+      <button class="btn-secondary" id="page3Prev" type="button">이전</button>
+      <button class="btn-primary" id="page3Next" type="button">다음</button>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 4 : 동의서 + 유입경로 ============ -->
+  <section class="page" id="page4">
+    <div class="consent-section">
+      <div class="consent-doc-title">이명 초진 설문지</div>
+      <h2>정밀 원인 분석을 위한 추가 검사 및 치료 안내 및 동의</h2>
+      <div class="consent-subtitle">- 모든 사람에게 시행하지 않으며 의사 판단 하 필요한 경우에 국한하여 시행 -</div>
+      <p>이명은 단순한 청각의 문제를 넘어 스트레스, 피로도, 자율신경계의 불균형과 밀접한 관련이 있습니다.</p>
+      <p>본원에서는 더욱 정확한 맞춤 치료 계획 수립을 위해 기본적인 청력검사, 이명도 검사 외에 아래와 같은 정밀 분석 검사를 시행하고 있습니다.</p>
+      <ul>
+        <li>자율신경계 및 스트레스 저항력 검사 : 이명으로 인한 신체적 스트레스 지수 및 자율신경 균형 상태 측정</li>
+        <li>정량뇌파검사(qEEG) : 이명 신호에 반응하는 뇌 신경계의 활성도 및 민감도 분석</li>
+      </ul>
+      <p>본원에서는 검사 결과에 따라 환자분께 가장 적합한 맞춤형 이명 조절 치료를 시행합니다. 아래 치료들은 증상 개선을 위해 시행될 수 있으며, 건강보험이 적용되지 않는 비급여 항목이 포함될 수 있습니다.</p>
+      <ul>
+        <li>경두개 자기장 치료(TMS) : 자기장을 이용해 이명과 관련된 뇌 부위의 활성도를 조절합니다.</li>
+        <li>경직류 전기자극 치료(tDCS) : 미세 전류를 통해 신경 가소성을 변화시켜 이명 민감도를 낮춥니다.</li>
+        <li>주사치료 : 이명 치료를 위해 약물을 고막 내 직접 주입하거나 수액을 통해 빠른 효과를 도모합니다.</li>
+      </ul>
+      <div class="fee-box">
+        <strong>[비급여 항목 안내]</strong>
+        <p>· 검사 - 자율신경계검사 : 3만원 / 정량뇌파검사 : 7만원 / 스트레스 저항력 검사 : 3만원</p>
+        <p>· 치료 - 경두개자기장치료, 경직류 전기자극치료, 주사치료 : 5~10만원</p>
+      </div>
+      <p>위 치료는 진료 결과에 따라 선별적으로 시행되며, 시행 항목에 따라 추가적인 비급여 비용이 발생하며, 환자분의 확인 및 동의 후에 진행합니다.</p>
+
+      <div class="signature-row">
+        <div class="sign-col">
+          <div class="label">성명 (아래 칸을 눌러 성명 쓰기)</div>
+          <div class="name-write-box" id="nameWriteBox">
+            <span id="namePlaceholder">눌러서 성명 쓰기</span>
+            <img id="namePreview" style="display:none;" alt="성명">
+          </div>
+        </div>
+        <div class="sign-col">
+          <div class="label">서명 (아래 칸을 눌러 서명해 주세요)</div>
+          <div class="signature-box" id="signatureBox">
+            <span id="signaturePlaceholder">눌러서 서명하기</span>
+            <img id="signaturePreview" style="display:none;" alt="서명">
+          </div>
+        </div>
+      </div>
+
+      <div class="insurance-row">
+        <label><input type="checkbox" id="insuranceDoc"> 실비보험 제출용 서류가 필요하신 분은 체크해 주세요.</label>
+        <div class="insurance-note">(제출에 필요한 서류를 미리 말씀해 주시면 빠른 발급이 가능합니다)</div>
+      </div>
+    </div>
+
+    <div class="referral-section">
+      <div class="referral-title">귀하께서는 어떤 경로를 통해 본원에 내원하게 되셨나요? (중복 선택 가능)</div>
+      <div class="referral-grid" id="referralGrid"></div>
+    </div>
+
+    <div class="page-error" id="page4Error"></div>
+    <div class="nav-buttons">
+      <button class="btn-secondary" id="page4Prev" type="button">이전</button>
+      <button class="btn-primary" id="page4Finish" type="button">완료</button>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 5 : 완료 ============ -->
+  <section class="page" id="page5">
+    <div class="thank-you">
+      <p>설문에 참여해주셔서 감사합니다.</p>
+      <p>설문 내용은 진료에 참고하겠습니다.</p>
+      <p id="insuranceNote" style="display:none;">실비보험 서류를 준비해드리겠습니다.</p>
+    </div>
+    <p id="uploadStatus" class="upload-status"></p>
+  </section>
+</div>
+
+<!-- ============ 서명 모달 ============ -->
+<div class="modal-overlay" id="sigModalOverlay">
+  <div class="modal-content">
+    <h3>서명해 주세요</h3>
+    <canvas id="signatureCanvas"></canvas>
+    <div class="modal-buttons">
+      <button class="btn-secondary" id="sigClear" type="button">지우기</button>
+      <button class="btn-secondary" id="sigCancel" type="button">취소</button>
+      <button class="btn-primary" id="sigConfirm" type="button">완료</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 성명 모달 ============ -->
+<div class="modal-overlay" id="nameModalOverlay">
+  <div class="modal-content">
+    <h3>성명을 써 주세요</h3>
+    <canvas id="nameCanvas"></canvas>
+    <div class="modal-buttons">
+      <button class="btn-secondary" id="nameClear" type="button">지우기</button>
+      <button class="btn-secondary" id="nameCancel" type="button">취소</button>
+      <button class="btn-primary" id="nameConfirm" type="button">완료</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ Google Drive 설정 ============ */
+const CLIENT_ID   = '135922871514-cbibjb8j6pdlrm8tmeums7bhbi2628m9.apps.googleusercontent.com';
+const PDF_FOLDER  = '1MB4Mx5hiyQKWlBVlJAROni6PI20bRFZV';
+const TXT_FOLDER  = '11I5bHU5_arXUINtNO0NHvxOIaYcg-iAl';
+const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+
+let tokenClient  = null;
+let pendingResult = null;
+
+function ensureTokenClient() {
+  if (tokenClient) return true;
+  if (!window.google || !window.google.accounts) return false;
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: DRIVE_SCOPE,
+    callback: onDriveTokenReceived,
+  });
+  return true;
+}
+
+async function onDriveTokenReceived(resp) {
+  const statusEl = document.getElementById('uploadStatus');
+  if (resp.error) {
+    statusEl.textContent = '인증 오류: ' + resp.error;
+    statusEl.className = 'upload-status error';
+    return;
+  }
+
+  const r = pendingResult;
+  if (!r) return;
+  const birth6   = formatBirth6(r.birth);
+  const baseName = r.name + '(' + birth6 + ')';
+
+  try {
+    statusEl.textContent = 'PDF 생성 중...';
+    statusEl.className = 'upload-status uploading';
+
+    const pdfBlob = await generatePdfBlob(r);
+    const txtBlob = new Blob([buildTextReport(r)], { type: 'text/plain;charset=utf-8' });
+
+    statusEl.textContent = 'Drive에 업로드 중...';
+
+    await driveUpload(pdfBlob, baseName + '-이명설문.pdf', 'application/pdf', PDF_FOLDER, resp.access_token);
+    await driveUpload(txtBlob, baseName + '-이명.txt',    'text/plain',       TXT_FOLDER,  resp.access_token);
+
+    statusEl.textContent = '✓ Drive 저장 완료';
+    statusEl.className = 'upload-status success';
+
+    downloadBlob(pdfBlob, baseName + '-이명설문.pdf');
+    downloadBlob(txtBlob, baseName + '-이명.txt');
+
+  } catch (err) {
+    statusEl.textContent = '오류: ' + err.message;
+    statusEl.className = 'upload-status error';
+  }
+}
+
+async function driveUpload(blob, name, mime, folderId, token) {
+  const meta = JSON.stringify({ name: name, mimeType: mime, parents: [folderId] });
+  const form = new FormData();
+  form.append('metadata', new Blob([meta], { type: 'application/json' }));
+  form.append('file', blob);
+  const res = await fetch(
+    'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+    { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: form }
+  );
+  if (!res.ok) {
+    const e = await res.json().catch(function() { return {}; });
+    throw new Error((e.error && e.error.message) || 'Drive 업로드 실패 (' + res.status + ')');
+  }
+}
+
+/* ============ 데이터 정의 ============ */
+
+/* ============ 한글 폰트 로딩 (페이지 시작 시 백그라운드) ============ */
+let koreanFontB64 = null;
+let koreanFontBoldB64 = null;
+(async function loadKoreanFonts() {
+  async function ttfToB64(url) {
+    const res = await fetch(url);
+    const buf = await res.arrayBuffer();
+    const bytes = new Uint8Array(buf);
+    let binary = "";
+    for (let i = 0; i < bytes.length; i += 8192) {
+      binary += String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + 8192, bytes.length)));
+    }
+    return btoa(binary);
+  }
+  try {
+    const BASE = "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/nanumgothic/";
+    [koreanFontB64, koreanFontBoldB64] = await Promise.all([
+      ttfToB64(BASE + "NanumGothic-Regular.ttf"),
+      ttfToB64(BASE + "NanumGothic-Bold.ttf"),
+    ]);
+  } catch (e) {
+    console.warn("한글 폰트 로딩 실패:", e);
+  }
+})();
+
+const referralOptions = [
+  { id: "internet", label: "인터넷 검색", sub: "(예: 네이버 등)" },
+  { id: "mapapp", label: "지도 앱 검색", sub: "(예 : 네이버 플레이스 등)" },
+  { id: "youtube", label: "유튜브/영상 매체", sub: "(예 : 유튜브 채널 이어코치)" },
+  { id: "community", label: "온라인 커뮤니티/카페", sub: "(예 : 지역/이명 관련 카페)" },
+  { id: "hospital", label: "타 병원 의료진의 소개", sub: "(예 : 진료 의뢰)" },
+  { id: "friend", label: "지인 및 가족의 추천", sub: "" },
+  { id: "signboard", label: "지나가다 간판 보고 방문", sub: "" },
+  { id: "other", label: "기타", sub: "" },
+];
+
+const symptomGroups = [
+  { key: "sensorineural", title: "감각신경성 이명", options: ["윙", "쉬", "기계소리", "매미소리"], hasOther: true },
+  { key: "vascular", title: "혈관성 이명", options: ["맥박 소리와 비슷한 빠르기", "욱욱욱", "쉭쉭쉭"], hasOther: true },
+  { key: "muscular", title: "근육 기원성 이명", options: ["딱딱딱", "두두둑", "지지직"], hasOther: false },
+  { key: "patulous", title: "개방성 이관", options: ["소리가 울려서 들림", "이충만감"], hasOther: false },
+];
+
+const vasScales = [
+  { key: "timePercent", question: "현재 수면을 취할 때를 제외하고 하루 중 이명을 느끼는 시간이 몇 퍼센트나 되나요?", left: "들리지 않는다", right: "쉬지않고 계속 들린다" },
+  { key: "distress", question: "이명으로 인한 당신의 괴로움이 얼마나 심하십니까?", left: "괴롭지 않다", right: "매우 심각하게 괴롭다" },
+  { key: "loudness", question: "이명의 크기는 어느 정도로 느끼시나요?", left: "전혀 들리지 않을 정도로 작다", right: "견딜 수 없을만큼 크다" },
+  { key: "dailyImpact", question: "이명으로 인해 일상생활에 미치는 영향은 어느 정도인가요?", left: "일상생활은 전혀 문제되지 않는다", right: "일상생활이 불가능하다" },
+];
+
+// THI 25 items: F=Functional, E=Emotional, C=Catastrophic (본원 설문지 분류 기준)
+const items = [
+  { text: "이명 때문에 집중하기가 어렵습니까?", cat: "F" },
+  { text: "이명의 크기로 인해 다른 사람이 말하는 것을 듣기가 어렵습니까?", cat: "F" },
+  { text: "이명으로 인해 화가 날 때가 있습니까?", cat: "E" },
+  { text: "이명으로 인해 난처한 경우가 있습니까?", cat: "F" },
+  { text: "이명이 절망적인 문제라고 생각하십니까?", cat: "C" },
+  { text: "이명에 대해 많이 불평하는 편이십니까?", cat: "E" },
+  { text: "이명 때문에 밤에 잠을 자기가 어려우십니까?", cat: "F" },
+  { text: "이명에서 벗어날 수 없다고 생각하십니까?", cat: "C" },
+  { text: "이명으로 인해 사회적 활동에 방해를 받습니까(예, 외식, 영화감상)?", cat: "F" },
+  { text: "이명 때문에 좌절감을 느끼는 경우가 있습니까?", cat: "F" },
+  { text: "이명이 심각한 질병이라고 생각하십니까?", cat: "C" },
+  { text: "이명으로 인해 삶의 즐거움이 감소됩니까?", cat: "F" },
+  { text: "이명으로 인해 업무나 가사 일을 하는데 방해를 받습니까?", cat: "F" },
+  { text: "이명 때문에 종종 짜증나는 경우가 있습니까?", cat: "F" },
+  { text: "이명 때문에 책을 읽는 것이 어렵습니까?", cat: "F" },
+  { text: "이명으로 인해 기분이 몹시 상하는 경우가 있습니까?", cat: "E" },
+  { text: "이명이 가족이나 친구 관계에 스트레스를 준다고 느끼십니까?", cat: "E" },
+  { text: "이명에서 벗어나 다른 일들에 주의를 집중하기가 어렵습니까?", cat: "F" },
+  { text: "이명을 자신이 통제할 수 없다고 생각하십니까?", cat: "C" },
+  { text: "이명 때문에 종종 피곤감을 느끼십니까?", cat: "F" },
+  { text: "이명 때문에 우울감을 느끼십니까?", cat: "E" },
+  { text: "이명으로 인해 불안감을 느끼십니까?", cat: "E" },
+  { text: "이명에 더 이상 대처할 수 없다고 생각하십니까?", cat: "C" },
+  { text: "스트레스를 받으면 이명이 더 심해집니까?", cat: "F" },
+  { text: "이명으로 인해 불안정한 기분을 느끼십니까?", cat: "E" },
+];
+
+const POINTS = { yes: 4, sometimes: 2, no: 0 };
+
+/* ============ 페이지 네비게이션 ============ */
+
+const pages = ["page1", "page2", "page3", "page4", "page5"];
+let currentPage = 0;
+let writtenAt = null;
+
+function showPage(idx) {
+  pages.forEach((id, i) => {
+    document.getElementById(id).classList.toggle("active", i === idx);
+  });
+  document.getElementById("patientInfoBar").style.display = idx === 0 ? "none" : "flex";
+  document.getElementById("fontSizeControls").classList.toggle("visible", idx >= 1 && idx <= 3);
+  currentPage = idx;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+/* ============ 글씨 크기 조절 ============ */
+
+const fontScales = [1, 1.15, 1.3, 1.45];
+let fontScaleIndex = 0;
+const containerEl = document.querySelector(".container");
+const fontDecreaseBtn = document.getElementById("fontDecrease");
+const fontIncreaseBtn = document.getElementById("fontIncrease");
+
+function applyFontScale() {
+  const scale = fontScales[fontScaleIndex];
+  containerEl.style.zoom = scale === 1 ? "" : scale;
+  fontDecreaseBtn.disabled = fontScaleIndex === 0;
+  fontIncreaseBtn.disabled = fontScaleIndex === fontScales.length - 1;
+}
+
+fontDecreaseBtn.addEventListener("click", () => {
+  if (fontScaleIndex > 0) {
+    fontScaleIndex--;
+    applyFontScale();
+  }
+});
+fontIncreaseBtn.addEventListener("click", () => {
+  if (fontScaleIndex < fontScales.length - 1) {
+    fontScaleIndex++;
+    applyFontScale();
+  }
+});
+applyFontScale();
+
+function formatDate(date) {
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}.${pad(date.getMonth() + 1)}.${pad(date.getDate())}`;
+}
+
+function updatePatientInfoBar() {
+  document.getElementById("infoName").textContent = document.getElementById("patientName").value || "-";
+  document.getElementById("infoBirth").textContent = document.getElementById("patientBirth").value || "-";
+  document.getElementById("infoChartNo").textContent = document.getElementById("chartNo").value || "-";
+  if (!writtenAt) writtenAt = formatDate(new Date());
+  document.getElementById("infoDateTime").textContent = writtenAt;
+}
+
+/* ============ PAGE 2 : 이명의 양상 / VAS 렌더링 ============ */
+
+const symptomGroupsContainer = document.getElementById("symptomGroups");
+symptomGroups.forEach((group) => {
+  const div = document.createElement("div");
+  div.className = "symptom-group";
+  let optsHtml = group.options.map((opt) =>
+    `<label><input type="checkbox" name="char_${group.key}" value="${opt}"> ${opt}</label>`
+  ).join("");
+  if (group.hasOther) {
+    optsHtml += `<label><input type="checkbox" name="char_${group.key}" value="기타" id="char_${group.key}_otherCheck"> 기타</label>
+      <input type="text" class="symptom-other-input" id="char_${group.key}_otherText" placeholder="직접 입력">`;
+  }
+  div.innerHTML = `<div class="symptom-group-title">${group.title}</div><div class="symptom-options">${optsHtml}</div>`;
+  symptomGroupsContainer.appendChild(div);
+});
+
+const vasBlocksContainer = document.getElementById("vasBlocks");
+vasScales.forEach((scale) => {
+  const div = document.createElement("div");
+  div.className = "q-block";
+  let optsHtml = "";
+  for (let i = 0; i <= 10; i++) {
+    optsHtml += `<label><input type="radio" name="vas_${scale.key}" value="${i}">${i}</label>`;
+  }
+  div.innerHTML = `
+    <div class="q-title">${scale.question}</div>
+    <div class="vas-options">${optsHtml}</div>
+    <div class="vas-anchors"><span>${scale.left}</span><span>${scale.right}</span></div>
+  `;
+  vasBlocksContainer.appendChild(div);
+});
+
+/* ============ PAGE 3 : THI 표 렌더링 ============ */
+
+const tbody = document.getElementById("questionBody");
+items.forEach((item, idx) => {
+  const qnum = idx + 1;
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td class="qnum">${qnum}</td>
+    <td class="qtext">${item.text}</td>
+    <td class="choice"><input type="radio" name="q${qnum}" value="yes"></td>
+    <td class="choice"><input type="radio" name="q${qnum}" value="sometimes"></td>
+    <td class="choice"><input type="radio" name="q${qnum}" value="no"></td>
+  `;
+  tbody.appendChild(tr);
+});
+
+function getGrade(total) {
+  if (total <= 16) return { grade: 1, label: "1단계 (경미한 정도, Slight)" };
+  if (total <= 36) return { grade: 2, label: "2단계 (약한 정도, Mild)" };
+  if (total <= 56) return { grade: 3, label: "3단계 (중간 정도, Moderate)" };
+  if (total <= 76) return { grade: 4, label: "4단계 (심한 정도, Severe)" };
+  return { grade: 5, label: "5단계 (매우 심한 정도, Catastrophic)" };
+}
+
+/* ============ 결과 텍스트 추출 ============ */
+
+const locationLabels = { right: "우측", left: "좌측", both: "양측", unknown: "위치 불명" };
+const onsetLabels = { gradual: "서서히", sudden: "갑자기" };
+const patulousLabels = { "소리가 울려서 들림": "소리가 울려서 들리는 증상", "이충만감": "이충만감" };
+
+function formatBirth6(birth) {
+  return birth.replace(/\./g, "").slice(2);
+}
+
+function buildTextReport(r) {
+  const lines = [];
+  const birth6 = formatBirth6(r.birth);
+  const titleSuffix = r.consent.insuranceDocNeeded ? " *SO" : "";
+  lines.push(`${r.name}(${birth6})${titleSuffix}`);
+
+  const d = r.tinnitusGeneral.duration;
+  const durParts = [];
+  if (Number(d.years) > 0) durParts.push(`${d.years}년`);
+  if (Number(d.months) > 0) durParts.push(`${d.months}개월`);
+  if (Number(d.days) > 0) durParts.push(`${d.days}일`);
+  const durText = durParts.length ? durParts.join(" ") : "0일";
+  const locText = locationLabels[r.tinnitusGeneral.location] || "";
+  const onsetText = onsetLabels[r.tinnitusGeneral.onset] || "";
+  lines.push(`- ${durText} 전부터 ${locText} 귀에서 이명이 ${onsetText} 발생`);
+
+  const character = r.tinnitusGeneral.character;
+  const characterTexts = [];
+  ["sensorineural", "vascular", "muscular"].forEach((key) => {
+    (character[key] || []).forEach((v) => {
+      if (v === "기타") {
+        const other = character[key + "_otherText"];
+        if (other) characterTexts.push(other);
+      } else {
+        characterTexts.push(v);
+      }
+    });
+  });
+  if (characterTexts.length) {
+    lines.push(`- 이명양상 : ${characterTexts.join(", ")}`);
+  }
+
+  const patulousTexts = [];
+  (character.patulous || []).forEach((v) => {
+    if (v === "기타") {
+      const other = character.patulous_otherText;
+      if (other) patulousTexts.push(other);
+    } else {
+      patulousTexts.push(patulousLabels[v] || v);
+    }
+  });
+  if (patulousTexts.length) {
+    lines.push(`- ${patulousTexts.join(", ")} 동반`);
+  }
+
+  const otherSym = [];
+  r.tinnitusGeneral.otherSymptoms.selected.forEach((v) => {
+    if (v === "기타") {
+      if (r.tinnitusGeneral.otherSymptoms.otherText) otherSym.push(r.tinnitusGeneral.otherSymptoms.otherText);
+    } else {
+      otherSym.push(v);
+    }
+  });
+  if (otherSym.length) {
+    lines.push(`- ${otherSym.join(", ")} 동반`);
+  }
+
+  const conditions = [];
+  r.tinnitusGeneral.underlyingConditions.selected.forEach((v) => {
+    if (v === "기타") {
+      if (r.tinnitusGeneral.underlyingConditions.otherText) conditions.push(r.tinnitusGeneral.underlyingConditions.otherText);
+    } else {
+      conditions.push(v);
+    }
+  });
+  if (conditions.length) {
+    lines.push(`- 기저질환 : ${conditions.join(", ")}`);
+  }
+
+  lines.push("");
+  lines.push("Tinnitus");
+  const vas = r.tinnitusGeneral.vas;
+  lines.push(`- Duration : ${vas.timePercent}/10, Annoyance : ${vas.distress}/10, Loudness : ${vas.loudness}/10`);
+  lines.push(`- THI : ${r.thi.scores.total}`);
+
+  return lines.join("\n");
+}
+
+/* ============ 로컬 파일 저장 ============ */
+
+async function generatePdfBlob(r) {
+  /* 폰트 로딩 대기 (최대 20초) */
+  if (!koreanFontB64) {
+    for (let i = 0; i < 20; i++) {
+      await new Promise(function(res) { setTimeout(res, 1000); });
+      if (koreanFontB64) break;
+    }
+    if (!koreanFontB64) throw new Error("한글 폰트를 불러오지 못했습니다. 인터넷 연결을 확인해 주세요.");
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: "p", unit: "mm", format: "a4", putOnlyUsedFonts: true });
+  const F = "NanumGothic";
+  doc.addFileToVFS("NanumGothic.ttf", koreanFontB64);
+  doc.addFont("NanumGothic.ttf", F, "normal");
+  if (koreanFontBoldB64) {
+    doc.addFileToVFS("NanumGothicBold.ttf", koreanFontBoldB64);
+    doc.addFont("NanumGothicBold.ttf", F, "bold");
+  }
+  doc.setFont(F, "normal");
+
+  const PW = 210, M = 15, CW = PW - 2 * M;
+  let y = 18;
+  const tg = r.tinnitusGeneral;
+
+  function tw(text, x, fs, maxW, bold) {
+    doc.setFont(F, bold ? "bold" : "normal");
+    doc.setFontSize(fs);
+    const lines = doc.splitTextToSize(text, maxW);
+    doc.text(lines, x, y);
+    y += lines.length * fs * 0.3528 * 1.5 + 1;
+    doc.setFont(F, "normal");
+  }
+
+  /* 이미지 원본 비율 유지 삽입 */
+  function addImgRatio(dataUrl, ix, iy, maxW, maxH) {
+    if (!dataUrl) return 0;
+    try {
+      var props = doc.getImageProperties(dataUrl);
+      var ratio = props.height / props.width;
+      var w = maxW, h = w * ratio;
+      if (h > maxH) { h = maxH; w = h / ratio; }
+      doc.addImage(dataUrl, "PNG", ix, iy, w, h, "", "FAST");
+      return h;
+    } catch(e) { return 0; }
+  }
+
+  const tblBase = {
+    theme: "grid",
+    styles: { font: F, fontStyle: "normal", fontSize: 8.5, cellPadding: 1.8 },
+    headStyles: { font: F, fontStyle: "bold", fillColor: [230, 230, 230], textColor: [0, 0, 0] },
+    margin: { left: M, right: M },
+  };
+
+  /* ===== PAGE 1 : 동의서 ===== */
+
+  /* ① 이명 초진 설문지 (좌측 소형) — 아래에 한 줄 띄움 */
+  doc.setFont(F, "bold"); doc.setFontSize(10);
+  doc.setTextColor(80, 80, 80);
+  doc.text("이명 초진 설문지", M, y); y += 13;
+  doc.setTextColor(0, 0, 0);
+
+  /* ② 정밀 원인 제목 (중앙 대형) */
+  doc.setFont(F, "bold"); doc.setFontSize(17);
+  const mainTitleLines = doc.splitTextToSize("정밀 원인 분석을 위한 추가 검사 및 치료 안내 및 동의", CW);
+  doc.text(mainTitleLines, PW / 2, y, { align: "center" });
+  y += mainTitleLines.length * 17 * 0.3528 * 1.2; /* 부제와 붙여서: 최소 간격 */
+
+  /* 부제 (제목에 붙여서, 바로 다음 줄) */
+  doc.setFont(F, "normal"); doc.setFontSize(10);
+  doc.setTextColor(60, 60, 60);
+  doc.text("- 모든 사람에게 시행하지 않으며 의사 판단 하 필요한 경우에 국한하여 시행 -", PW / 2, y, { align: "center" });
+  y += 9;
+  doc.setTextColor(0, 0, 0);
+
+  /* ③ 환자 정보 (각 줄 별도) */
+  doc.setFont(F, "normal"); doc.setFontSize(9);
+  doc.text("환자번호 : " + (r.chartNo || "-"), M, y); y += 5;
+  doc.text("환자이름 : " + r.name + " (" + r.birth + ")", M, y); y += 5;
+  doc.text("검사일 : " + (r.examDate || r.writtenAt), M, y); y += 6;
+
+  /* 구분선 */
+  doc.setLineWidth(0.4); doc.line(M, y, PW - M, y); y += 7;
+
+  /* 본문 */
+  tw("이명은 단순한 청각의 문제를 넘어 스트레스, 피로도, 자율신경계의 불균형과 밀접한 관련이 있습니다.", M, 10, CW);
+  y += 2;
+  tw("본원에서는 더욱 정확한 맞춤 치료 계획 수립을 위해 기본적인 청력검사, 이명도 검사 외에 아래와 같은 정밀 분석 검사를 시행하고 있습니다.", M, 10, CW);
+  y += 1;
+  tw("· 자율신경계 및 스트레스 저항력 검사 : 이명으로 인한 신체적 스트레스 지수 및 자율신경 균형 상태 측정", M + 3, 10, CW - 3);
+  tw("· 정량뇌파검사(qEEG) : 이명 신호에 반응하는 뇌 신경계의 활성도 및 민감도 분석", M + 3, 10, CW - 3);
+  y += 3;
+  tw("본원에서는 검사 결과에 따라 환자분께 가장 적합한 맞춤형 이명 조절 치료를 시행합니다. 아래 치료들은 증상 개선을 위해 시행될 수 있으며, 건강보험이 적용되지 않는 비급여 항목이 포함될 수 있습니다.", M, 10, CW);
+  y += 1;
+  tw("· 경두개 자기장 치료(TMS) : 자기장을 이용해 이명과 관련된 뇌 부위의 활성도를 조절합니다.", M + 3, 10, CW - 3);
+  tw("· 경직류 전기자극 치료(tDCS) : 미세 전류를 통해 신경 가소성을 변화시켜 이명 민감도를 낮춥니다.", M + 3, 10, CW - 3);
+  tw("· 주사치료 : 이명 치료를 위해 약물을 고막 내 직접 주입하거나 수액을 통해 빠른 효과를 도모합니다.", M + 3, 10, CW - 3);
+  y += 3;
+
+  /* ④ 비급여 박스: 제목 아래 한 줄 띄움, 치료 아래 빈 줄 없음, 박스 후 한 줄 띄움 */
+  var boxStartY = y;
+  doc.setFont(F, "bold"); doc.setFontSize(11);
+  doc.text("[비급여 항목 안내]", M + 4, y + 6); y += 14; /* 제목 높이 + 한 줄 여백 */
+  doc.setFont(F, "normal");
+  tw("· 검사 - 자율신경계검사 : 3만원 / 정량뇌파검사 : 7만원 / 스트레스 저항력 검사 : 3만원", M + 4, 10, CW - 8);
+  tw("· 치료 - 경두개자기장치료, 경직류 전기자극치료, 주사치료 : 5~10만원", M + 4, 10, CW - 8);
+  y += 2; /* 박스 하단 최소 여백 */
+  doc.setLineWidth(0.3); doc.rect(M, boxStartY, CW, y - boxStartY);
+  y += 8; /* 박스 아래 한 줄 띄움 */
+
+  tw("위 치료는 진료 결과에 따라 선별적으로 시행되며, 시행 항목에 따라 추가적인 비급여 비용이 발생하며, 환자분의 확인 및 동의 후에 진행합니다.", M, 10, CW);
+  y += 5;
+
+  /* 작성일자 */
+  doc.setFont(F, "normal"); doc.setFontSize(10);
+  doc.text("작성일자 : " + r.writtenAt, PW / 2, y, { align: "center" }); y += 12;
+
+  /* ⑤ 성명/서명: 문서 중앙부위에서 시작, 이미지 원본 비율 유지 */
+  var sigX = PW / 2;          /* 중앙 시작점 */
+  var sigLW = 26;             /* 라벨 영역 */
+  var sigImgX = sigX + sigLW;
+  var sigImgMaxW = PW - M - sigImgX; /* ≈ 64mm */
+  var sigImgMaxH = 26;
+
+  doc.setFontSize(11); doc.setFont(F, "bold");
+  doc.text("성명 (자필)", sigX, y + 8);
+  doc.setFont(F, "normal");
+  var nameH = addImgRatio(r.consent.nameImage, sigImgX, y, sigImgMaxW, sigImgMaxH);
+  y += Math.max(nameH > 0 ? nameH : 12, 12) + 6;
+
+  doc.setFont(F, "bold"); doc.text("서명", sigX, y + 8); doc.setFont(F, "normal");
+  var sigH2 = addImgRatio(r.consent.signature, sigImgX, y, sigImgMaxW, sigImgMaxH);
+  y += Math.max(sigH2 > 0 ? sigH2 : 12, 12);
+
+  /* ===== PAGE 2 : 설문 결과 ===== */
+  doc.addPage(); y = 18;
+  doc.setFont(F, "bold"); doc.setFontSize(14);
+  doc.text("이명 초진 설문지 - 설문 결과", PW / 2, y, { align: "center" }); y += 7;
+  doc.setFont(F, "normal"); doc.setFontSize(9);
+  doc.text("환자번호: " + (r.chartNo || "-") + "   환자이름: " + r.name + " (" + r.birth + ")   검사일: " + (r.examDate || r.writtenAt), M, y); y += 5;
+  doc.setLineWidth(0.4); doc.line(M, y, PW - M, y); y += 7;
+
+  /* --- ⑥ 이명 일반 설문 (카테고리당 한 줄, 선택 항목 v+bold) --- */
+  doc.setFont(F, "bold"); doc.setFontSize(12);
+  doc.text("이명 일반 설문", M, y); y += 5;
+  doc.setFont(F, "normal");
+
+  var dur = tg.duration;
+  var durText = [
+    Number(dur.years) > 0 ? dur.years + "년" : "",
+    Number(dur.months) > 0 ? dur.months + "개월" : "",
+    Number(dur.days) > 0 ? dur.days + "일" : ""
+  ].filter(Boolean).join(" ") || "0일";
+
+  function radioLine(optMap, sel) {
+    return Object.entries(optMap).map(function(e) {
+      return (sel === e[0] ? "v " : "") + e[1];
+    }).join(", ");
+  }
+  function checkLine(opts, sel, hasOther, otherTxt) {
+    var parts = opts.map(function(o) { return (sel.includes(o) ? "v " : "") + o; });
+    if (hasOther) {
+      var isO = sel.includes("기타");
+      parts.push((isO ? "v " : "") + "기타" + (isO && otherTxt ? "(" + otherTxt + ")" : ""));
+    }
+    return parts.join(", ");
+  }
+
+  var surveyBody = [
+    [{ content: "이명 위치",          styles: { fillColor: [247,247,247] } },
+     radioLine({ right:"우측", left:"좌측", both:"양측", unknown:"위치 불명" }, tg.location)],
+    [{ content: "발생 기간",          styles: { fillColor: [247,247,247] } }, durText],
+    [{ content: "발생 양상",          styles: { fillColor: [247,247,247] } },
+     radioLine({ gradual:"서서히", sudden:"갑자기" }, tg.onset)],
+    [{ content: "감각신경성 이명",    styles: { fillColor: [247,247,247] } },
+     checkLine(["윙","쉬","기계소리","매미소리"], tg.character.sensorineural||[], true, tg.character.sensorineural_otherText||"")],
+    [{ content: "혈관성 이명",        styles: { fillColor: [247,247,247] } },
+     checkLine(["맥박 소리와 비슷한 빠르기","욱욱욱","쉭쉭쉭"], tg.character.vascular||[], true, tg.character.vascular_otherText||"")],
+    [{ content: "근육 기원성 이명",   styles: { fillColor: [247,247,247] } },
+     checkLine(["딱딱딱","두두둑","지지직"], tg.character.muscular||[], false, "")],
+    [{ content: "개방성 이관",        styles: { fillColor: [247,247,247] } },
+     checkLine(["소리가 울려서 들림","이충만감"], tg.character.patulous||[], false, "")],
+    [{ content: "이명 외 증상",       styles: { fillColor: [247,247,247] } },
+     checkLine(["난청","어지러움","중이염"], tg.otherSymptoms.selected, true, tg.otherSymptoms.otherText||"")],
+    [{ content: "현재 앓고 있는 질환", styles: { fillColor: [247,247,247] } },
+     checkLine(["혈압","당뇨","뇌경색","뇌출혈","턱관절 장애","두경부 외상"], tg.underlyingConditions.selected, true, tg.underlyingConditions.otherText||"")],
+    [{ content: "큰 소리 불편감",     styles: { fillColor: [247,247,247] } },
+     radioLine({ yes:"있다", no:"없다" }, tg.loudDiscomfort)],
+  ];
+
+  doc.autoTable(Object.assign({}, tblBase, {
+    startY: y,
+    body: surveyBody,
+    columnStyles: { 0: { cellWidth: 38 }, 1: { cellWidth: CW - 38 } },
+    /* 선택 항목(v 접두어)은 굵게 — willDrawCell: 기본 텍스트만 억제, didDrawCell: 실제 드로잉 */
+    willDrawCell: function(data) {
+      if (data.section !== "body" || data.column.index !== 1) return;
+      var raw = data.cell.raw;
+      if (typeof raw !== "string" || !raw.includes("v ")) return;
+      data.cell.text = []; /* 배경 rect 아래에 그려지지 않도록 기본 텍스트만 억제 */
+    },
+    didDrawCell: function(data) {
+      if (data.section !== "body" || data.column.index !== 1) return;
+      var raw = data.cell.raw;
+      if (typeof raw !== "string" || !raw.includes("v ")) return;
+      /* 배경·테두리가 모두 그려진 후 텍스트를 위에 그림 */
+      var parts = raw.split(", ");
+      var cx = data.cell.x + 2;
+      var cy = data.cell.y + data.cell.height / 2 + 1.2;
+      var canBold = !!koreanFontBoldB64;
+      doc.setFont(F, "normal");
+      doc.setFontSize(8.5);
+      doc.setTextColor(0, 0, 0);
+      for (var pi = 0; pi < parts.length; pi++) {
+        var part = parts[pi];
+        var isSel = part.startsWith("v ");
+        doc.setFont(F, (isSel && canBold) ? "bold" : "normal");
+        var tw = doc.getTextWidth(part);
+        doc.text(part, cx, cy);
+        cx += tw;
+        if (pi < parts.length - 1) {
+          doc.setFont(F, "normal");
+          var sw = doc.getTextWidth(", ");
+          doc.text(", ", cx, cy);
+          cx += sw;
+        }
+      }
+      doc.setFont(F, "normal");
+    },
+  }));
+  y = doc.lastAutoTable.finalY + 14;
+
+  /* --- 이명 관련 VAS --- */
+  doc.setFont(F, "bold"); doc.setFontSize(12);
+  doc.text("이명 관련 VAS (0~10)", M, y); y += 5;
+  doc.setFont(F, "normal");
+  doc.autoTable(Object.assign({}, tblBase, {
+    startY: y,
+    body: [
+      [{ content: "이명을 느끼는 시간 (%)", styles: { fillColor: [247,247,247] } }, tg.vas.timePercent + " / 10"],
+      [{ content: "이명으로 인한 괴로움",   styles: { fillColor: [247,247,247] } }, tg.vas.distress + " / 10"],
+      [{ content: "이명의 크기",             styles: { fillColor: [247,247,247] } }, tg.vas.loudness + " / 10"],
+      [{ content: "일상생활 영향",           styles: { fillColor: [247,247,247] } }, tg.vas.dailyImpact + " / 10"],
+    ],
+    columnStyles: { 0: { cellWidth: 100 }, 1: { cellWidth: CW - 100 } },
+  }));
+  y = doc.lastAutoTable.finalY + 14;
+
+  /* --- THI --- */
+  doc.setFont(F, "bold"); doc.setFontSize(12);
+  doc.text("THI (Tinnitus Handicap Inventory)", M, y); y += 10;
+
+  var sc = r.thi.scores;
+  doc.setFont(F, "bold"); doc.setFontSize(10);
+  doc.text(
+    "Total: " + sc.total + "   Functional: " + sc.functional +
+    "   Emotional: " + sc.emotional + "   Catastrophic: " + sc.catastrophic +
+    "   Grade: " + r.thi.grade,
+    M, y
+  ); y += 5;
+  doc.setFont(F, "normal");
+  doc.text(r.thi.gradeLabel, M, y); y += 9;
+
+  doc.autoTable(Object.assign({}, tblBase, {
+    startY: y,
+    head: [["번호", "문항", "그렇다", "가끔 그렇다", "아니다"]],
+    body: r.thi.answers.map(function(a, i) {
+      return [
+        String(i + 1),
+        items[i].text,
+        a.answer === "yes"       ? "○" : "",
+        a.answer === "sometimes" ? "○" : "",
+        a.answer === "no"        ? "○" : ""
+      ];
+    }),
+    styles: { font: F, fontStyle: "normal", fontSize: 8, cellPadding: 2 },
+    columnStyles: {
+      0: { cellWidth: 13, halign: "center" },
+      1: { cellWidth: 114 },
+      2: { cellWidth: 16, halign: "center" },
+      3: { cellWidth: 21, halign: "center" },
+      4: { cellWidth: 16, halign: "center" },
+    },
+  }));
+
+  return doc.output("blob");
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function() { URL.revokeObjectURL(url); }, 2000);
+}
+
+async function saveFilesLocally(r) {
+  const statusEl = document.getElementById('uploadStatus');
+  pendingResult = r;
+
+  if (!ensureTokenClient()) {
+    statusEl.textContent = 'Google 라이브러리 로딩 중... 잠시 후 다시 시도해 주세요.';
+    statusEl.className = 'upload-status error';
+    return;
+  }
+
+  statusEl.textContent = 'Drive 연결 중...';
+  statusEl.className = 'upload-status uploading';
+  tokenClient.requestAccessToken({ prompt: '' });
+}
+
+/* ============ PAGE 4 : 유입경로 렌더링 ============ */
+
+const referralGrid = document.getElementById("referralGrid");
+referralOptions.forEach((opt) => {
+  const div = document.createElement("div");
+  div.className = "referral-item";
+  let html = `<label><input type="checkbox" name="referral" value="${opt.id}"> ${opt.label}</label>`;
+  if (opt.sub) html += `<div class="sub">${opt.sub}</div>`;
+  if (opt.id === "other") {
+    html += `<input type="text" id="referralOtherText" placeholder="기타 경로를 입력해 주세요">`;
+  }
+  div.innerHTML = html;
+  referralGrid.appendChild(div);
+});
+
+/* ============ 서명 패드 ============ */
+
+let signatureDataURL = null;
+const sigOverlay = document.getElementById("sigModalOverlay");
+const sigCanvas = document.getElementById("signatureCanvas");
+let sigCtx = null;
+let drawing = false;
+let lastX = 0, lastY = 0;
+
+function setupSignatureCanvas() {
+  const ratio = window.devicePixelRatio || 1;
+  const rect = sigCanvas.getBoundingClientRect();
+  sigCanvas.width = rect.width * ratio;
+  sigCanvas.height = rect.height * ratio;
+  sigCtx = sigCanvas.getContext("2d");
+  sigCtx.scale(ratio, ratio);
+  sigCtx.lineWidth = 2.5;
+  sigCtx.lineCap = "round";
+  sigCtx.strokeStyle = "#000";
+}
+
+function getPointerPos(e) {
+  const rect = sigCanvas.getBoundingClientRect();
+  return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+}
+
+sigCanvas.addEventListener("pointerdown", (e) => {
+  drawing = true;
+  const p = getPointerPos(e);
+  lastX = p.x; lastY = p.y;
+});
+sigCanvas.addEventListener("pointermove", (e) => {
+  if (!drawing) return;
+  const p = getPointerPos(e);
+  sigCtx.beginPath();
+  sigCtx.moveTo(lastX, lastY);
+  sigCtx.lineTo(p.x, p.y);
+  sigCtx.stroke();
+  lastX = p.x; lastY = p.y;
+});
+window.addEventListener("pointerup", () => { drawing = false; });
+
+document.getElementById("signatureBox").addEventListener("click", () => {
+  sigOverlay.classList.add("active");
+  requestAnimationFrame(setupSignatureCanvas);
+});
+
+document.getElementById("sigClear").addEventListener("click", () => {
+  sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+});
+
+document.getElementById("sigCancel").addEventListener("click", () => {
+  sigOverlay.classList.remove("active");
+});
+
+document.getElementById("sigConfirm").addEventListener("click", () => {
+  signatureDataURL = sigCanvas.toDataURL("image/png");
+  document.getElementById("signaturePreview").src = signatureDataURL;
+  document.getElementById("signaturePreview").style.display = "block";
+  document.getElementById("signaturePlaceholder").style.display = "none";
+  sigOverlay.classList.remove("active");
+});
+
+/* ============ 성명 패드 ============ */
+
+let nameDataURL = null;
+const nameOverlay = document.getElementById("nameModalOverlay");
+const nameCanvas = document.getElementById("nameCanvas");
+let nameCtx = null;
+let nameDrawing = false;
+let nameLastX = 0, nameLastY = 0;
+
+function setupNameCanvas() {
+  const ratio = window.devicePixelRatio || 1;
+  const rect = nameCanvas.getBoundingClientRect();
+  nameCanvas.width = rect.width * ratio;
+  nameCanvas.height = rect.height * ratio;
+  nameCtx = nameCanvas.getContext("2d");
+  nameCtx.scale(ratio, ratio);
+  nameCtx.lineWidth = 2.5;
+  nameCtx.lineCap = "round";
+  nameCtx.strokeStyle = "#000";
+}
+
+function getNamePointerPos(e) {
+  const rect = nameCanvas.getBoundingClientRect();
+  return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+}
+
+nameCanvas.addEventListener("pointerdown", (e) => {
+  nameDrawing = true;
+  const p = getNamePointerPos(e);
+  nameLastX = p.x; nameLastY = p.y;
+});
+nameCanvas.addEventListener("pointermove", (e) => {
+  if (!nameDrawing) return;
+  const p = getNamePointerPos(e);
+  nameCtx.beginPath();
+  nameCtx.moveTo(nameLastX, nameLastY);
+  nameCtx.lineTo(p.x, p.y);
+  nameCtx.stroke();
+  nameLastX = p.x; nameLastY = p.y;
+});
+window.addEventListener("pointerup", () => { nameDrawing = false; });
+
+document.getElementById("nameWriteBox").addEventListener("click", () => {
+  nameOverlay.classList.add("active");
+  requestAnimationFrame(() => requestAnimationFrame(setupNameCanvas));
+});
+document.getElementById("nameClear").addEventListener("click", () => {
+  nameCtx.clearRect(0, 0, nameCanvas.width, nameCanvas.height);
+});
+document.getElementById("nameCancel").addEventListener("click", () => {
+  nameOverlay.classList.remove("active");
+});
+document.getElementById("nameConfirm").addEventListener("click", () => {
+  nameDataURL = nameCanvas.toDataURL("image/png");
+  document.getElementById("namePreview").src = nameDataURL;
+  document.getElementById("namePreview").style.display = "block";
+  document.getElementById("namePlaceholder").style.display = "none";
+  nameOverlay.classList.remove("active");
+});
+
+/* ============ PAGE 1 : 날짜 자동 포맷 (YYYYMMDD -> YYYY.MM.DD) ============ */
+
+function formatDateDigits(value) {
+  const digits = value.replace(/[^0-9]/g, "").slice(0, 8);
+  if (digits.length > 6) return digits.slice(0, 4) + "." + digits.slice(4, 6) + "." + digits.slice(6);
+  if (digits.length > 4) return digits.slice(0, 4) + "." + digits.slice(4);
+  return digits;
+}
+
+function isCompleteDate(value) {
+  return /^\d{4}\.\d{2}\.\d{2}$/.test(value.trim());
+}
+
+[document.getElementById("patientBirth"), document.getElementById("examDate")].forEach((el) => {
+  el.addEventListener("input", () => {
+    el.value = formatDateDigits(el.value);
+  });
+});
+
+document.getElementById("examDate").value = formatDateDigits(
+  new Date().getFullYear() + String(new Date().getMonth() + 1).padStart(2, "0") + String(new Date().getDate()).padStart(2, "0")
+);
+
+/* ============ 페이지 1 -> 2 : 환자 정보 검증 ============ */
+
+document.getElementById("page1Next").addEventListener("click", () => {
+  const errors = [];
+  if (!document.getElementById("patientName").value.trim()) errors.push("이름을 입력해 주세요.");
+  if (!document.getElementById("chartNo").value.trim()) errors.push("환자번호를 입력해 주세요.");
+  if (!isCompleteDate(document.getElementById("patientBirth").value)) errors.push("생년월일을 8자리 숫자(YYYYMMDD)로 입력해 주세요.");
+  if (!isCompleteDate(document.getElementById("examDate").value)) errors.push("검사일을 8자리 숫자(YYYYMMDD)로 입력해 주세요.");
+
+  const errBox = document.getElementById("page1Error");
+  if (errors.length) {
+    errBox.innerHTML = errors.join("<br>");
+    errBox.style.display = "block";
+    return;
+  }
+  errBox.style.display = "none";
+  updatePatientInfoBar();
+  showPage(1);
+});
+
+/* ============ 페이지 2 <-> 이동 / 검증 ============ */
+
+document.getElementById("page2Next").addEventListener("click", () => {
+  const errors = [];
+  if (!document.querySelector('input[name="location"]:checked')) errors.push("이명이 들리는 위치를 선택해 주세요.");
+  const y = document.getElementById("durYears").value;
+  const m = document.getElementById("durMonths").value;
+  const d = document.getElementById("durDays").value;
+  if (!y && !m && !d) errors.push("이명이 생긴 기간을 입력해 주세요.");
+  if (!document.querySelector('input[name="onset"]:checked')) errors.push("이명의 발생 양상을 선택해 주세요.");
+  if (!document.querySelector('input[name="loudDiscomfort"]:checked')) errors.push("큰 소리를 들었을 때 불편함 여부를 선택해 주세요.");
+  vasScales.forEach((scale) => {
+    if (!document.querySelector(`input[name="vas_${scale.key}"]:checked`)) {
+      errors.push("'" + scale.question + "' 항목에 응답해 주세요.");
+    }
+  });
+
+  const errBox = document.getElementById("page2Error");
+  if (errors.length) {
+    errBox.innerHTML = errors.join("<br>");
+    errBox.style.display = "block";
+    return;
+  }
+  errBox.style.display = "none";
+  showPage(2);
+});
+
+/* ============ 페이지 3 <-> 이동 / 검증 ============ */
+
+document.getElementById("page3Prev").addEventListener("click", () => {
+  showPage(1);
+});
+
+document.getElementById("page3Next").addEventListener("click", () => {
+  const errors = [];
+  for (let i = 0; i < items.length; i++) {
+    if (!document.querySelector(`input[name="q${i + 1}"]:checked`)) {
+      errors.push("모든 문항에 응답해 주세요.");
+      break;
+    }
+  }
+
+  const errBox = document.getElementById("page3Error");
+  if (errors.length) {
+    errBox.innerHTML = errors.join("<br>");
+    errBox.style.display = "block";
+    return;
+  }
+  errBox.style.display = "none";
+  showPage(3);
+});
+
+/* ============ 페이지 4 : 동의서/방문경로 + 결과 계산 ============ */
+
+document.getElementById("page4Prev").addEventListener("click", () => {
+  showPage(2);
+});
+
+let lastResult = null;
+
+document.getElementById("page4Finish").addEventListener("click", () => {
+  const errors = [];
+  if (!nameDataURL) errors.push("성명란을 눌러 성명을 써 주세요.");
+  if (!signatureDataURL) errors.push("서명란을 눌러 서명을 입력해 주세요.");
+
+  const errBox = document.getElementById("page4Error");
+  if (errors.length) {
+    errBox.innerHTML = errors.join("<br>");
+    errBox.style.display = "block";
+    return;
+  }
+  errBox.style.display = "none";
+
+  /* THI 채점 */
+  const answers = [];
+  let scoreF = 0, scoreE = 0, scoreC = 0;
+  for (let i = 0; i < items.length; i++) {
+    const checked = document.querySelector(`input[name="q${i + 1}"]:checked`);
+    const val = checked.value;
+    const pts = POINTS[val];
+    answers.push({ q: i + 1, answer: val, points: pts });
+    if (items[i].cat === "F") scoreF += pts;
+    else if (items[i].cat === "E") scoreE += pts;
+    else scoreC += pts;
+  }
+  const total = scoreF + scoreE + scoreC;
+  const gradeInfo = getGrade(total);
+
+  /* 페이지 2, 4 데이터 수집 */
+  const referral = {
+    selected: Array.from(document.querySelectorAll('input[name="referral"]:checked')).map(el => el.value),
+    other: document.getElementById("referralOtherText").value,
+  };
+
+  const character = {};
+  symptomGroups.forEach((group) => {
+    character[group.key] = Array.from(document.querySelectorAll(`input[name="char_${group.key}"]:checked`)).map(el => el.value);
+    if (group.hasOther) {
+      character[group.key + "_otherText"] = document.getElementById(`char_${group.key}_otherText`).value;
+    }
+  });
+
+  const vas = {};
+  vasScales.forEach((scale) => {
+    const checked = document.querySelector(`input[name="vas_${scale.key}"]:checked`);
+    vas[scale.key] = checked ? Number(checked.value) : null;
+  });
+
+  lastResult = {
+    name: document.getElementById("patientName").value,
+    birth: document.getElementById("patientBirth").value,
+    chartNo: document.getElementById("chartNo").value,
+    examDate: document.getElementById("examDate").value,
+    writtenAt: writtenAt,
+    consent: {
+      nameImage: nameDataURL,
+      signature: signatureDataURL,
+      insuranceDocNeeded: document.getElementById("insuranceDoc").checked,
+    },
+    referral: referral,
+    tinnitusGeneral: {
+      location: document.querySelector('input[name="location"]:checked')?.value || null,
+      duration: {
+        years: document.getElementById("durYears").value || 0,
+        months: document.getElementById("durMonths").value || 0,
+        days: document.getElementById("durDays").value || 0,
+      },
+      onset: document.querySelector('input[name="onset"]:checked')?.value || null,
+      character: character,
+      otherSymptoms: {
+        selected: Array.from(document.querySelectorAll('input[name="otherSymptoms"]:checked')).map(el => el.value),
+        otherText: document.getElementById("otherSymptoms_otherText").value,
+      },
+      underlyingConditions: {
+        selected: Array.from(document.querySelectorAll('input[name="underlyingConditions"]:checked')).map(el => el.value),
+        otherText: document.getElementById("underlyingConditions_otherText").value,
+      },
+      loudDiscomfort: document.querySelector('input[name="loudDiscomfort"]:checked')?.value || null,
+      vas: vas,
+    },
+    thi: {
+      scores: { functional: scoreF, emotional: scoreE, catastrophic: scoreC, total: total },
+      grade: gradeInfo.grade,
+      gradeLabel: gradeInfo.label,
+      answers: answers,
+    },
+  };
+
+  document.getElementById("insuranceNote").style.display = document.getElementById("insuranceDoc").checked ? "block" : "none";
+
+  showPage(4);
+  saveFilesLocally(lastResult);
+});
+
+/* ============ 서비스 워커 등록 ============ */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('./sw.js').catch(function(err) {
+      console.warn('SW 등록 실패:', err);
+    });
+  });
+}
+</script>
+</body>
+</html>
