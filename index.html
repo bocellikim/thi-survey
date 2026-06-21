@@ -1259,15 +1259,17 @@ async function generatePdfBlob(r) {
   }
 
   /* PDF 각 페이지 하단 병원 브랜드 삽입 */
+  var footeredPages = {};
   function addPageFooter() {
-    var PW = 210;
-    var footerY = 289;
-    var label = '분당하나이비인후과의원';
-    doc.setFont(F, 'bold');
-    doc.setFontSize(9);
-    doc.setTextColor(80, 80, 80);
-    if (logoB64) {
-      try {
+    try {
+      var PW = 210;
+      var footerY = 289;
+      var label = '분당하나이비인후과의원';
+      var canBold = !!koreanFontBoldB64;
+      doc.setFont(F, canBold ? 'bold' : 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(80, 80, 80);
+      if (logoB64) {
         var props = doc.getImageProperties(logoB64);
         var logoH = 7;
         var logoW = logoH * (props.width / props.height);
@@ -1276,14 +1278,20 @@ async function generatePdfBlob(r) {
         var startX = (PW - (logoW + gap + textW)) / 2;
         doc.addImage(logoB64, 'PNG', startX, footerY - logoH + 1, logoW, logoH, '', 'FAST');
         doc.text(label, startX + logoW + gap, footerY);
-      } catch(e) {
+      } else {
         doc.text(label, PW / 2, footerY, { align: 'center' });
       }
-    } else {
-      doc.text(label, PW / 2, footerY, { align: 'center' });
+      doc.setTextColor(0, 0, 0);
+      doc.setFont(F, 'normal');
+    } catch(e) {
+      console.warn('footer 오류:', e);
     }
-    doc.setTextColor(0, 0, 0);
-    doc.setFont(F, 'normal');
+  }
+  function addPageFooterOnce() {
+    var pageNum = doc.internal.getCurrentPageInfo().pageNumber;
+    if (footeredPages[pageNum]) return;
+    footeredPages[pageNum] = true;
+    addPageFooter();
   }
 
   /* 이미지 원본 비율 유지 삽입 */
@@ -1304,6 +1312,7 @@ async function generatePdfBlob(r) {
     styles: { font: F, fontStyle: "normal", fontSize: 8.5, cellPadding: 1.8 },
     headStyles: { font: F, fontStyle: "bold", fillColor: [230, 230, 230], textColor: [0, 0, 0] },
     margin: { left: M, right: M },
+    didDrawPage: function() { addPageFooterOnce(); },
   };
 
   /* ===== PAGE 1 : 동의서 ===== */
@@ -1386,7 +1395,7 @@ async function generatePdfBlob(r) {
   var sigH2 = addImgRatio(r.consent.signature, sigImgX, y, sigImgMaxW, sigImgMaxH);
   y += Math.max(sigH2 > 0 ? sigH2 : 12, 12);
 
-  addPageFooter();
+  addPageFooterOnce();
 
   /* ===== PAGE 2 : 설문 결과 ===== */
   doc.addPage(); y = 18;
@@ -1538,7 +1547,7 @@ async function generatePdfBlob(r) {
       4: { cellWidth: 16, halign: "center" },
     },
   }));
-  addPageFooter();
+  addPageFooterOnce();
 
   return doc.output("blob");
 }
